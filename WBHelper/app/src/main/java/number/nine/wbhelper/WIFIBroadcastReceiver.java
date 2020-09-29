@@ -1,4 +1,4 @@
-package number.nine;
+package number.nine.wbhelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,13 +22,38 @@ import number.nine.wbhelper.WifiEvent.BroadcastBus;
  */
 public class WIFIBroadcastReceiver extends BroadcastReceiver {
 
-    public static final int CONNECTEDSTATE=1;//已连接状态
-    public static final int PSDWRONGSTATE=2;//密码错误状态
-    public static final int FAILEDSTATE=3;//连接失败状态
-    public static final int SUCCESSSTATE=4;//成功连接状态
+    /**
+     * 低版本适配状态
+     */
+    public static final int CONNECTEDSTATE = 1;//已连接状态
+    public static final int PSDWRONGSTATE = 2;//密码错误状态
+    public static final int FAILEDSTATE = 3;//连接失败状态
+    public static final int SUCCESSSTATE = 4;//成功连接状态
 
+    /**
+     * 监听wifi状态变化
+     * 此处对wifi状态进行判断，DISABLING (0)，DISABLED (1)，ENABLING  (2)，ENABLED (3)
+     * 因为运行时往往截获不到，常见状态为1和3
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            int wifiState = wifiManager.getWifiState();
+            sendNetworkStateChange(wifiState);
+        }
+
+    }
+
+
+    /**
+     * 版本较低时可以通过下面方式监听到WiFi状态
+     * TODO 需要对版本进行适配，找到低版本的具体值，然后执行下属方案
+     */
+    private void LowAndroidBroadcast(Intent intent){
+
         if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction())) {
             //密码错误广播,是不是正在获得IP地址
             int linkWifiResult = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
@@ -94,15 +119,14 @@ public class WIFIBroadcastReceiver extends BroadcastReceiver {
             }
         }
     }
-
     /**
-     * 发送网络状态eventBus.
+     * 发送网络状态BroadcastBus,只要是序列化对象都转成String返回
      *
      * @param state
      */
     private <T extends Serializable> void sendNetworkStateChange(T state) {
         BroadcastBus.getDefault().postMessage(state);
-        Log.e("TestConnection",String.valueOf(state));
+        Log.e("WifiConnection", String.valueOf(state));
     }
 
 

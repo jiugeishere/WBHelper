@@ -1,4 +1,4 @@
-package number.nine;
+package number.nine.wbhelper;
 
 public abstract class WBuilder {
 

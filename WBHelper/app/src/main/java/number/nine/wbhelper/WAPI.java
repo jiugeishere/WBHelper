@@ -1,16 +1,19 @@
-package number.nine;
+package number.nine.wbhelper;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 
 
 import androidx.core.app.ActivityCompat;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +28,16 @@ public class WAPI {
     public WAPI(Context context) {
         this.wcontext=context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.startScan();//进入时便开始扫描，减少后续扫描时间
         registerBroadcast(true);//默认注册广播
     }
 
+
+    /**
+     * wifi单例模式
+     * @param context
+     * @return
+     */
     public static WAPI getInstance(Context context) {
         if (wapis == null) {
             synchronized (WAPI.class) {
@@ -85,14 +95,32 @@ public class WAPI {
         }
     }
 
+
     /**
-     * 获取WiFi列表
+     * 适配Andoroid获取wifi列表需要定位权限问题
+     * @param activity
+     */
+    private boolean checkPermission(Activity activity){
+        //动态获取定位权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && wcontext.checkSelfPermission(
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[] { Manifest.permission.ACCESS_COARSE_LOCATION },
+                    100);
+            return false;
+        } else {
+            return true;
+        }
+    }
+    /**
+     * 获取WiFi列表,如果用户不给定位权限
      * @return
      */
-    public List<ScanResult> getWifiList() {
+    public List<ScanResult> getWifiList(){
         List<ScanResult> resultList = new ArrayList<>();
-        if (wifiManager != null && isWifiEnable()) {
-            resultList.addAll(wifiManager.getScanResults());
+        if (checkPermission((Activity)wcontext)){
+            if (wifiManager != null && isWifiEnable()) {
+                resultList.addAll(wifiManager.getScanResults());
+            }
         }
         return resultList;
     }
@@ -119,7 +147,7 @@ public class WAPI {
     }
 
     /**
-     * wifi设置
+     * wifi设置,用以wifi连接
      * @param ssid
      * @param pws
      * @param isHasPws

@@ -1,5 +1,7 @@
 package number.nine.wbhelper.WifiEvent;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class BroadcastBus {
     }
     //传递连接状态
     public void postConnection(String connection){
+        Log.e("TestConnection",connection);
         for (BroadcastListener eventListener : listeners) {
             eventListener.getConnection(connection);
         }
