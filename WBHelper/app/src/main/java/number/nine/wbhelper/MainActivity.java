@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements BroadcastListener
         button=findViewById(R.id.wifi_button);
         WAPI.getInstance(this).openWifi();
         BroadcastBus.getDefault().register(this);
+        WAPI.getInstance(this).startWifiRefresh();
+        WAPI.getInstance(this).creatWifiLock();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,5 +54,13 @@ public class MainActivity extends AppCompatActivity implements BroadcastListener
     @Override
     public void getConnection(String connection) {
         Log.e("WifiConnection",connection);
+    }
+
+    @Override
+    public void getRefreshWifiList(List<ScanResult> scanResults) {
+        Log.e("Wifi","Size"+scanResults.size());
+        for (ScanResult scanResult:scanResults){
+            Log.e("WifiRefreshWifiList","BSSID"+scanResult.BSSID+"SSID"+scanResult.SSID+"capabilities"+scanResult.capabilities);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package number.nine.wbhelper.WifiEvent;
 
+import android.net.wifi.ScanResult;
 import android.util.Log;
 
 import java.io.Serializable;
@@ -40,6 +41,12 @@ public class BroadcastBus {
         Log.e("TestConnection",connection);
         for (BroadcastListener eventListener : listeners) {
             eventListener.getConnection(connection);
+        }
+    }
+
+    public void postScanlist(List<ScanResult> scanResults){
+        for (BroadcastListener eventListener : listeners) {
+            eventListener.getRefreshWifiList(scanResults);
         }
     }
 

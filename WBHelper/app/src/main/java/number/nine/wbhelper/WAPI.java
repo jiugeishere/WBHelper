@@ -1,6 +1,7 @@
 package number.nine.wbhelper;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -9,13 +10,19 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+
+import number.nine.wbhelper.WifiEvent.BroadcastBus;
 
 public class WAPI {
 
@@ -24,7 +31,9 @@ public class WAPI {
 
     private WifiManager wifiManager;
     private WIFIBroadcastReceiver mBroadcastReceiver=new WIFIBroadcastReceiver();
-
+    // 定义一个WifiLock
+    private WifiManager.WifiLock mWifiLock;
+    private static boolean wThreadflag=true;
     public WAPI(Context context) {
         this.wcontext=context;
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -32,6 +41,19 @@ public class WAPI {
         registerBroadcast(true);//默认注册广播
     }
 
+    /**
+     * wifi线程，用于异步不断刷新wifi列表，活性执行wifi列表刷新
+     */
+    @SuppressLint("HandlerLeak")
+    Handler whandler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 6562) {
+                BroadcastBus.getDefault().postScanlist((List<ScanResult>) msg.obj);
+            }
+        }
+    };
 
     /**
      * wifi单例模式
@@ -111,18 +133,84 @@ public class WAPI {
             return true;
         }
     }
+
     /**
-     * 获取WiFi列表,如果用户不给定位权限
+     * 关闭线程刷新
+     */
+    public void closeRefresh(){
+        wThreadflag=false;
+    }
+
+    /**
+     * 开启线程刷新list，默认4秒刷新一轮
+     */
+    public void startWifiRefresh(){
+      startRefreshThreadl(4000);
+    }
+
+    /**
+     * 开启线程刷新list,可自定义时间
+     */
+    public void startWifiRefresh(int refreshtime){
+        startRefreshThreadl(refreshtime);
+    }
+
+    private void startRefreshThreadl(final int refreshtime){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (wThreadflag){
+                    Message message = new Message();
+                    message.what = 6562;
+                    message.obj= getWifiList();
+                    whandler.sendMessage(message);
+                    try {
+                        Thread.sleep(refreshtime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }).start();
+    }
+    /**
+     * 获取WiFi列表,如果用户不给定位权限就返回null
      * @return
      */
     public List<ScanResult> getWifiList(){
         List<ScanResult> resultList = new ArrayList<>();
-        if (checkPermission((Activity)wcontext)){
-            if (wifiManager != null && isWifiEnable()) {
-                resultList.addAll(wifiManager.getScanResults());
-            }
+        if (checkPermission((Activity)wcontext)&&wifiManager != null && isWifiEnable()){
+            resultList.addAll(wifiManager.getScanResults());
         }
         return resultList;
+    }
+
+    // 创建一个WifiLock,避免后台休眠被打断,默认创建就锁定
+    public void creatWifiLock(String tag) {
+        if (tag==null){
+            tag="WifiLock";
+        }
+        mWifiLock = wifiManager.createWifiLock(tag);
+        acquireWifiLock();
+    }
+
+    // 创建一个WifiLock,避免后台休眠被打断,默认创建WifiLock
+    public void creatWifiLock() {
+        mWifiLock = wifiManager.createWifiLock("WifiLock");
+        acquireWifiLock();
+    }
+    // 锁定WifiLock
+    public void acquireWifiLock() {
+        mWifiLock.acquire();
+    }
+
+    // 解锁WifiLock
+    public void releaseWifiLock() {
+        // 判断时候锁定
+        if (mWifiLock.isHeld()) {
+            mWifiLock.acquire();
+        }
     }
 
     /**
