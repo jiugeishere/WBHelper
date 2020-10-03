@@ -50,7 +50,6 @@ public class WIFIBroadcastReceiver extends BroadcastReceiver {
 
     /**
      * 版本较低时可以通过下面方式监听到WiFi状态
-     * TODO 需要对版本进行适配，找到低版本的具体值，然后执行下属方案
      */
     private void LowAndroidBroadcast(Intent intent){
 

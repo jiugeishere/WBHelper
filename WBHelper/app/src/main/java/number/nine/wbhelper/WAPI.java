@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
@@ -26,7 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import number.nine.wbhelper.WifiEvent.BroadcastBus;
+import number.nine.wbhelper.wbdata.SharedPreferencesUtil;
 
+/**
+ * wifi各种API在此调用
+ * wifi状态广播监听
+ * wifi开关，wifi锁
+ * 列表刷新和自动刷新
+ * 自动权限控制
+ *
+ */
 public class WAPI {
 
     private static WAPI wapis = null;
@@ -40,8 +50,6 @@ public class WAPI {
     private static boolean wThreadflag = true;
     //没有打开定位服务是否自动调转
     private static boolean autoOpenLocation=false;
-    //当前定位服务状态
-    private  boolean LocationState;
 
     public WAPI(Context context) {
         this.wcontext = context;
@@ -291,7 +299,7 @@ public class WAPI {
     }
 
     /**
-     * 有密码连接
+     * 有密码连接,记忆密码
      *
      * @param ssid
      * @param pws
@@ -299,7 +307,9 @@ public class WAPI {
     public void connectWifiPws(String ssid, String pws) {
         wifiManager.disableNetwork(wifiManager.getConnectionInfo().getNetworkId());
         int netId = wifiManager.addNetwork(getWifiConfig(ssid, pws, true));
-        wifiManager.enableNetwork(netId, true);
+       if (wifiManager.enableNetwork(netId, true)){
+           SharedPreferencesUtil.getInstance(wcontext).putData(ssid,pws);
+       }
     }
 
     /**
@@ -315,7 +325,6 @@ public class WAPI {
 
     /**
      * wifi设置,用以wifi连接
-     *
      * @param ssid
      * @param pws
      * @param isHasPws

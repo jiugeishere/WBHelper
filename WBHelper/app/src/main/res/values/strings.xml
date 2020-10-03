@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">WBHelper</string>
+    <string name="wifiadapter_wb">Wifi</string>
+    <string name="ipadapter_wb">Mac</string>
+    <string name="wifi_icon">wifi连接的前置图标</string>
 </resources>
