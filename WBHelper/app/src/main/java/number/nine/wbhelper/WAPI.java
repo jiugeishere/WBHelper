@@ -207,6 +207,13 @@ public class WAPI {
     }
 
     /**
+     * 判断是否已开启自动刷新
+     * @return
+     */
+    public boolean getRefreshflag(){
+        return wThreadflag;
+    }
+    /**
      * 系统wifi会在10分钟或者5分钟内进行扫描，
      * 一超出就会停止扫描服务，
      * 所以可以通过判断为0（亮屏这些操作也可）的次数来进行wifi扫描
@@ -264,6 +271,7 @@ public class WAPI {
      */
     public List<ScanResult> getRefreshWifiList() {
         List<ScanResult> resultList = new ArrayList<>();
+        wifiManager.startScan();
         if (wifiManager != null && isWifiEnable()) {
             resultList.addAll(wifiManager.getScanResults());
         }

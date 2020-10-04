@@ -1,65 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="40dp"
+    android:layout_marginTop="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/wifi_icon"
         android:layout_marginStart="15dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_centerVertical="true"
         android:src="@drawable/wifi_5"
         android:contentDescription="@string/wifi_icon" />
-    <LinearLayout
-        android:id="@+id/wifiname_linear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/wifi_icon"
-        android:layout_marginTop="5dp"
-        android:layout_marginStart="15dp"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="35sp"
-            android:layout_height="wrap_content"
-            android:text="@string/wifiadapter_wb"
-            style="@style/font_style1"/>
-        <TextView
-            android:id="@+id/wifi_name"
-            android:layout_marginStart="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/font_style1"
-            android:text="jj"/>
-    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/wifiname_linear"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="30dp"
         android:layout_toEndOf="@id/wifi_icon"
-        android:layout_marginTop="2dp"
-        android:layout_marginStart="15dp"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="35sp"
-            android:layout_height="wrap_content"
-            style="@style/font_style1"
-            android:text="@string/ipadapter_wb"/>
-        <TextView
-            android:id="@+id/wifi_mac"
-            android:layout_marginStart="8dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/wifiname_linear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/font_style1"
-            android:text="124.124.142.124"/>
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/font_style1"
+                android:layout_width="35sp"
+                android:layout_height="wrap_content"
+                android:text="@string/wifiadapter_wb" />
+
+            <TextView
+                android:id="@+id/wifi_name"
+                style="@style/font_style1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="jj" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/font_style1"
+                android:layout_width="35sp"
+                android:layout_height="wrap_content"
+                android:text="@string/ipadapter_wb" />
+
+            <TextView
+                android:id="@+id/wifi_mac"
+                style="@style/font_style1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="124.124.142.124" />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView
         android:id="@+id/wifi_connect_icon"
-        android:layout_width="30dp"
-        android:layout_height="40dp"
+        android:layout_width="20dp"
+        android:layout_height="25dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/wifi_connect"
